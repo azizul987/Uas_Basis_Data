@@ -131,3 +131,22 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- ====================================================
+-- 10. Tambhkan Pembeli
+-- ====================================================
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_tambah_pembeli$$
+CREATE PROCEDURE sp_tambah_pembeli(
+    IN p_nama VARCHAR(255),
+    IN p_nomor VARCHAR(20),
+    IN p_alamat TEXT
+)
+BEGIN
+    INSERT INTO pembeli (nama_pembeli, nomor_telepon, alamat)
+    VALUES (p_nama, p_nomor, p_alamat);
+END$$
+
+DELIMITER ;

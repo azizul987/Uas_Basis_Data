@@ -11,4 +11,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-alter event ev_auto_cancel_pesanan_kedaluwarsa disable
+-- alter event ev_auto_cancel_pesanan_kedaluwarsa disable;
+
+-- ALTER EVENT ev_auto_cancel_pesanan_kedaluwarsa
+-- ON SCHEDULE EVERY 30 SECOND;
