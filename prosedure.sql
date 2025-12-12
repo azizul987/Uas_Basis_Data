@@ -96,3 +96,38 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+
+-- ====================================================
+-- 9. [ADMIN] Hapus Produk (Safety Delete)
+-- ====================================================
+DROP PROCEDURE IF EXISTS sp_hapus_produk$$
+CREATE PROCEDURE sp_hapus_produk(IN p_id_produk INT)
+BEGIN
+    DECLARE jumlah_transaksi INT;
+    
+    -- 1. Cek apakah produk ini pernah terjual?
+    SELECT COUNT(*) INTO jumlah_transaksi 
+    FROM item_pesanan 
+    WHERE id_produk = p_id_produk;
+
+    -- 2. Logika Keputusan
+    IF jumlah_transaksi > 0 THEN
+        -- OPSI A: Jika sudah pernah terjual, JANGAN HAPUS, tapi nol-kan stoknya (Soft Delete)
+        UPDATE produk 
+        SET stok = 0, nama_produk = CONCAT(nama_produk, ' (DISCONTINUED)')
+        WHERE id_produk = p_id_produk;
+        
+        SELECT 'Produk sudah pernah terjual. Data tidak dihapus, tapi status diubah jadi DISCONTINUED dan stok 0.' AS Status_Hapus;
+        
+    ELSE
+        -- OPSI B: Jika belum pernah terjual sama sekali, BOLEH DIHAPUS permanen
+        DELETE FROM produk WHERE id_produk = p_id_produk;
+        
+        SELECT 'Produk berhasil dihapus permanen dari database.' AS Status_Hapus;
+    END IF;
+
+END$$
+
+DELIMITER ;
