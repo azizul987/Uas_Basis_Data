@@ -1,28 +1,38 @@
-INSERT INTO pembeli (nama_pembeli, nomor_telepon, alamat) VALUES
-('Budi Santoso', '081234567890', 'Jl. Merdeka No. 10, Jakarta'),
-('Siti Aminah', '085678901234', 'Jl. Kebon Jeruk No. 5, Bandung'),
-('Rudi Hermawan', '081345678901', 'Jl. Sudirman No. 45, Surabaya');
+-- 2. ISI DATA PRODUK (Pakai Procedure)
+-- Format: (Nama, Harga, Stok)
+CALL sp_tambah_produk('Buku Tulis Sidu', 5000, 100);
+CALL sp_tambah_produk('Pulpen AE7 Hitam', 2500, 200);
+CALL sp_tambah_produk('Penghapus Karet', 1000, 300);
+CALL sp_tambah_produk('Spidol Papan Tulis', 8000, 50);
+CALL sp_tambah_produk('Kertas HVS A4', 45000, 20);
 
--- 2. Insert Produk
-INSERT INTO produk (nama_produk, harga, stok) VALUES
-('Buku Tulis Sidu 58 Lembar', 5000, 100),
-('Pulpen Standard AE7 Hitam', 2500, 200),
-('Pensil 2B Faber Castell', 4000, 150),
-('Penghapus Karet Kecil', 1000, 300),
-('Kertas HVS A4 70gr (1 Rim)', 45000, 25);
+-- 3. SIMULASI TRANSAKSI 1: Si Budi Belanja (LUNAS)
+-- a. Budi buat pesanan baru. ID Pesanan disimpan di variabel @nota_budi
+CALL sp_buat_pesanan(1, @nota_budi);
 
--- 3. Insert Pesanan (HEADER SAJA, TOTAL BIAR TRIGGER YANG ISI)
-INSERT INTO pesanan (id_pembeli, total_item, total_harga, status_pesanan) VALUES
-(1, 0, 0, 'Lunas'),   -- Pesanan Budi
-(2, 0, 0, 'Pending'); -- Pesanan Siti
+-- b. Budi masukkan barang ke keranjangnya (@nota_budi)
+-- Format: (ID Pesanan, ID Produk, Jumlah)
+-- ID Produk 1 = Buku, ID Produk 5 = Kertas HVS
+CALL sp_tambah_item_pesanan(@nota_budi, 1, 10); -- Beli 10 Buku
+CALL sp_tambah_item_pesanan(@nota_budi, 5, 1);  -- Beli 1 Rim Kertas
 
--- 4. Insert Item Pesanan (CUKUP ID & JUMLAH, SISANYA OTOMATIS)
--- Budi beli 1 Rim Kertas & 2 Buku
-INSERT INTO item_pesanan (id_pesanan, id_produk, jumlah) VALUES
-(1, 5, 1), 
-(1, 1, 2);
+-- c. Budi Bayar ke Kasir
+CALL sp_bayar_pesanan(@nota_budi);
 
--- Siti beli 2 Pulpen & 1 Pensil
-INSERT INTO item_pesanan (id_pesanan, id_produk, jumlah) VALUES
-(2, 2, 2),   
-(2, 3, 1);
+
+-- 4. SIMULASI TRANSAKSI 2: Si Siti Belanja (MASIH PENDING/BELANJA)
+-- a. Siti buat pesanan baru. ID disimpan di variabel @nota_siti
+CALL sp_buat_pesanan(2, @nota_siti);
+
+-- b. Siti masukkan barang
+CALL sp_tambah_item_pesanan(@nota_siti, 2, 5); -- Beli 5 Pulpen
+CALL sp_tambah_item_pesanan(@nota_siti, 3, 2); -- Beli 2 Penghapus
+
+-- c. Siti BELUM bayar (Jangan panggil sp_bayar_pesanan)
+
+
+-- 5. SIMULASI TRANSAKSI 3: Si Rudi (DIBATALKAN)
+CALL sp_buat_pesanan(3, @nota_rudi);
+CALL sp_tambah_item_pesanan(@nota_rudi, 4, 2); -- Beli 2 Spidol
+-- Rudi berubah pikiran, cancel pesanan
+CALL sp_batalkan_pesanan(@nota_rudi);

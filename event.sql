@@ -1,7 +1,3 @@
--- Hapus event lama dulu
-DROP EVENT IF EXISTS ev_auto_cancel_pesanan_kedaluwarsa;
-
--- Buat baru versi Demo (Cek tiap 10 detik, Cancel jika lewat 1 menit)
 DELIMITER $$
 CREATE EVENT ev_auto_cancel_pesanan_kedaluwarsa
 ON SCHEDULE EVERY 10 SECOND 
@@ -14,3 +10,5 @@ BEGIN
     AND tanggal_pesanan < (NOW() - INTERVAL 1 MINUTE); -- Cuma 1 menit lgsg batal
 END$$
 DELIMITER ;
+
+alter event ev_auto_cancel_pesanan_kedaluwarsa disable

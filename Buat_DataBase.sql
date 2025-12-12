@@ -1,5 +1,5 @@
-
--- create database toko_kelompok_1;
--- show databases;
--- use toko_kelompok_1;
+create database toko_kelompok_1;
+show databases;
+use toko_kelompok_1;
+SET GLOBAL event_scheduler = ON;
 
